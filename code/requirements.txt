@@ -1,0 +1,41 @@
+# BI Plagiarism — reference-code requirements
+#
+# IMPORTANT: create the venv with Python 3.11 or 3.12 (NOT 3.14).
+# Several packages below lag new CPython releases on Windows.
+#   py -3.12 -m venv .venv
+#   .venv\Scripts\activate
+#   pip install -r requirements.txt
+#
+# Ollama (https://ollama.com) is a separate install, then:
+#   ollama pull bge-m3
+#   ollama pull qwen3:8b
+
+# --- Engine A: similarity -------------------------------------------------
+datasketch>=1.6.0        # MinHash-LSH candidate retrieval
+numpy>=1.26              # embedding matrix (faiss optional, see embedding_index.py)
+# faiss-cpu>=1.8         # optional; enable past ~1M chunks (Python 3.11/3.12 wheels)
+
+# --- Ingest / editors -----------------------------------------------------
+python-docx>=1.1.0       # DOCX read + in-place edit
+python-pptx>=0.6.23      # PPTX read + in-place edit
+pymupdf>=1.24            # PDF input-only extraction (import name: fitz)
+# pdf2docx>=0.5.8        # optional: PDF->DOCX conversion path
+# pytesseract pdf2image  # optional: OCR for scanned PDFs
+
+# --- Engine B: AI indicator ----------------------------------------------
+torch>=2.2               # stage 1 needs token logprobs (Ollama doesn't expose them)
+transformers>=4.44
+accelerate>=0.33
+# Models: Qwen/Qwen3-0.6B (stage 1), meta-llama/Llama-3.2-1B(+Instruct) for
+# the optional Binoculars score — see code/perplexity_burstiness.py
+
+# --- Backend --------------------------------------------------------------
+fastapi>=0.111
+uvicorn>=0.30
+requests>=2.31
+pydantic>=2.7
+pytest>=8.0
+
+# --- Acceptance tests (docs/10 Phase 1) -----------------------------------
+# pytest code/  → fingerprint.py and minhash_index.py self-tests must pass
+# pytest code/  → docx_inplace.py and pptx_inplace.py self-tests must pass
